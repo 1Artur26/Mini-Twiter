@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ post.title }}</title>
+</head>
+<body>
+    <h1>{{ post.title }}</h1>
+    <p>Public: {{ post.created_at }} by {{ post.user.username }}</p>
+    <p>{{ post.content }}</p>
+
+    <h2>Comment</h2>
+    {% if post.comment_set.all %}
+        <ul>
+        {% for comment in post.comment_set.all %}
+            <li>
+                <strong>{{ comment.user.username }}:</strong>
+                {{ comment.content }}
+                <br>
+                Опубліковано: {{ comment.created_at }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No comments for this post</p>
+    {% endif %}
+
+    <!-- Додавання коментаря (посилання на форму додавання коментаря) -->
+    <a href="{% url 'add_comment' post.id %}">add Comment</a>
+</body>
+</html>

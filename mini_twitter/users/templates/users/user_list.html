@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User List</title>
+</head>
+<body>
+    <h1>User List</h1>
+    <ul>
+    {% for user in users %}
+        <li>
+            {{ user.username }} - {{ user.email }}
+            <!-- Додавання кнопки або посилання для деталей про користувача -->
+            <a href="{% url 'user_detail' user.id %}">Деталі користувача</a>
+        </li>
+    {% endfor %}
+    </ul>
+</body>
+</html>

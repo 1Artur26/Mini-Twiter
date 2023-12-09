@@ -1,50 +1,84 @@
-from django.shortcuts import render, get_object_or_404, redirect
-
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth import get_user_model
 from .models import Post, Comment
-from users.models import  User
+from django.urls import reverse_lazy
 from .forms import PostForm, CommentForm
+from django.views.generic import ListView, DetailView, TemplateView, CreateView, UpdateView, DeleteView
+from django.views import View
 
-def post_list(request, username=None):
-    if username:
-        user = get_object_or_404(User, username=username)
-        posts = Post.objects.filter(user=user)
-    else:
-        posts = Post.objects.all()
-    return render(request, 'post/post_list.html', {'posts': posts})
+class PostListView(ListView):
+    model = Post
 
+class AddPostView(CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'post/add_post.html'
+    success_url = reverse_lazy('post_list')
 
-def add_post(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('post_list')  
-    else:
-        form = PostForm()
-    return render(request, 'post/add_post.html', {'form': form})
+    def form_valid(self, form):
+        form.instance.user = get_user_model().objects.get(pk=self.request.user.pk) 
+        return super().form_valid(form)
 
 
-def add_comment(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.save()
-            return redirect('post_list')
-    else:
-        form = CommentForm()
-    return render(request, 'post/add_comment.html', {'form': form, 'post': post})
+class AddCommentView(CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'post/add_comment.html'
+
+    def form_valid(self, form):
+        form.instance.post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        form.instance.user = get_user_model().objects.get(pk=self.request.user.pk) 
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('post_list')
 
 
-def view_comments(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    comments = Comment.objects.filter(post=post)
-    return render(request, 'post/comment_list.html', {'post': post, 'comments': comments})
+class CommentListView(ListView):
+    model = Comment
+    template_name = 'post/comment_list.html'
+    context_object_name = 'comments'
+
+    def get_queryset(self):
+        post_id = self.kwargs.get('post_id')
+        return Comment.objects.filter(post_id=post_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['post'] = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
+        return context
 
 
-def post_detail(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    return render(request, 'post/post_detail.html', {'post': post})
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'post/post_detail.html'
+    context_object_name = 'post'
+    pk_url_kwarg = 'post_id'
+    
+
+class MainPageView(TemplateView):
+    template_name = 'post/base.html'
+
+
+
+class ToggleLikeView(View):
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+        if request.user in post.likes.all():
+            post.likes.remove(request.user)
+        else:
+            post.likes.add(request.user)
+        return redirect('post_detail', post_id=post_id)
+    
+
+class PostUpdateView(UpdateView):
+    model = Post
+    fields = ['title', 'content']
+    template_name = 'post/edit_post.html'
+    success_url = reverse_lazy('post_list')
+
+class PostDeleteView(DeleteView):
+    model = Post
+    template_name = 'post/confirm_delete.html'
+    success_url = reverse_lazy('post_list')
 

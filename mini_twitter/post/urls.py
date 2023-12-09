@@ -1,11 +1,14 @@
 from django.urls import path
-from .views import  post_list, add_post, add_comment, view_comments, post_detail
+from post.views import  PostListView, AddCommentView, AddPostView, PostDetailView, CommentListView, ToggleLikeView, PostUpdateView, PostDeleteView
 
 urlpatterns = [
-    path('posts/<str:username>/', post_list, name='post_list_by_user'),
-    path('posts/', post_list, name='post_list'),
-    path('add_post/', add_post, name='add_post'),
-    path('post/<int:post_id>/', post_detail, name='post_detail'),
-    path('posts/<int:post_id>/add_comment/', add_comment, name='add_comment'),
-    path('post/<int:post_id>/comments/', view_comments, name='view_comments'),
+    path('posts/', PostListView.as_view(), name='post_list'),
+    path('add_post/', AddPostView.as_view(), name='add_post'),
+    path('post/<int:post_id>/', PostDetailView.as_view(), name='post_detail'),
+    path('posts/<int:post_id>/add_comment/', AddCommentView.as_view(), name='add_comment'),
+    path('post/<int:post_id>/comments/', CommentListView.as_view(), name='view_comments'),
+    path('post/<int:post_id>/toggle_like/', ToggleLikeView.as_view(), name='toggle_like'),
+    path('post/<int:pk>/edit/', PostUpdateView.as_view(), name='post_edit'),
+    path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post_delete'),
+
 ]

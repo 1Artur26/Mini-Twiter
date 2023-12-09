@@ -1,0 +1,10 @@
+{% extends 'post/base.html' %}
+
+{% block content %}
+    <h1>{{ user.username }} is following</h1>
+    <ul>
+        {% for user in following %}
+            <li>{{ user.username }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

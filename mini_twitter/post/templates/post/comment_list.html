@@ -1,14 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Comments for {{ post.title }}</title>
-</head>
-<body>
-    <h1>Comments for "{{ post.title }}"</h1>
-    <ul>
-    {% for comment in comments %}
-        <li>{{ comment.content }} - by {{ comment.user.username }}</li>
-    {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends 'post/base.html' %}
+
+{% block content %}
+    <h1 class="mt-4">Comments for "{{ post.title }}"</h1>
+    {% if comments %}
+        <div class="list-group">
+            {% for comment in comments %}
+                <div class="list-group-item">
+                    <p class="mb-1">{{ comment.content }}</p>
+                    <small>Autor: {{ comment.user.username }}</small>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>This post does not have comment.</p>
+    {% endif %}
+{% endblock %}

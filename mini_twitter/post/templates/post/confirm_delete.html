@@ -1,0 +1,5 @@
+<form method="post">{% csrf_token %}
+    <p>Are you sure you want to delete this post?</p>
+    <button type="submit">yes, Delate</button>
+    <a href="{% url 'post_list' %}">No, back to post list</a>
+</form>

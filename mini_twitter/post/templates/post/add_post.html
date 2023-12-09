@@ -1,14 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Post</title>
-</head>
-<body>
-    <h1>Add New Post</h1>
-    <form method="post">
+{% extends 'post/base.html' %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+    <h1 class="mt-4">Add New Post</h1>
+    <form method="post" class="mt-3">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Post</button>
+        <button type="submit" class="btn btn-primary">Post</button>
     </form>
-</body>
-</html>
+    {% else %}
+      <div class="px-4 py-5 my-5 text-center">
+        <img class="d-block mx-auto mb-4" src="D:\Downloads\bug.svg" alt="" width="72" height="57">
+        <h1 class="display-5 fw-bold text-body-emphasis">Who you are?</h1>
+        <div class="col-lg-6 mx-auto">
+          <p class="lead mb-4">You must register or log-in to leave comments or create posts.</p>
+          <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{% url 'login' %}" class="btn btn-warning">Log-in</a>
+            <a href="{% url 'auth' %}" class="btn btn-warning">Sign-up</a>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+{% endblock %}

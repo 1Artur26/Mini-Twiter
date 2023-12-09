@@ -1,30 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ post.title }}</title>
-</head>
-<body>
-    <h1>{{ post.title }}</h1>
-    <p>Public: {{ post.created_at }} by {{ post.user.username }}</p>
+{% extends 'post/base.html' %}
+
+{% block content %}
+    <h1 class="mt-4">{{ post.title }}</h1>
+    <p>Public: {{ post.created_at }} from user {{ post.user.username }}</p>
     <p>{{ post.content }}</p>
 
-    <h2>Comment</h2>
+    <h2 class="mt-4">Comments</h2>
     {% if post.comment_set.all %}
-        <ul>
-        {% for comment in post.comment_set.all %}
-            <li>
-                <strong>{{ comment.user.username }}:</strong>
-                {{ comment.content }}
-                <br>
-                Опубліковано: {{ comment.created_at }}
-            </li>
-        {% endfor %}
-        </ul>
+        <div class="list-group">
+            {% for comment in post.comment_set.all %}
+                <div class="list-group-item">
+                    <h5 class="mb-1"><strong>{{ comment.user.username }}</strong></h5>
+                    <p class="mb-1">{{ comment.content }}</p>
+                    <small>Public: {{ comment.created_at }}</small>
+                </div>
+            {% endfor %}
+        </div>
     {% else %}
-        <p>No comments for this post</p>
+        <p>This comment does not have comment</p>
     {% endif %}
 
-    <!-- Додавання коментаря (посилання на форму додавання коментаря) -->
-    <a href="{% url 'add_comment' post.id %}">add Comment</a>
-</body>
-</html>
+    <a href="{% url 'add_comment' post.id %}" class="btn btn-primary mt-3">Add Comment</a>
+    {% if request.user == post.user %}
+        <a href="{% url 'post_edit' post.id %}" class="btn btn-sm btn-primary">Edit</a>
+        <a href="{% url 'post_delete' post.id %}" class="btn btn-sm btn-danger">Delate</a>
+    {% endif %}
+    <form action="{% url 'toggle_like' post.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="like-button">
+            {% if request.user in post.likes.all %}
+                <img src="\static\img\heart-fill.svg" alt="Unlike"><p>{{ post.likes.count }} Likes</p>
+            {% else %}
+                <img src="\static\img\heart.svg" alt="Like"><p>{{ post.likes.count }} Likes</p>
+            {% endif %}
+        </button>
+    </form>
+{% endblock %}

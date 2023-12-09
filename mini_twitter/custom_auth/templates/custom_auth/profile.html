@@ -1,0 +1,32 @@
+{% extends 'post/base.html' %}
+
+{% block content %}
+    
+    <h1 class="mt-4">{{ user.username }}</h1>
+    <h2 class="mt-4">{{ user.email }}</h2>
+
+    <!-- Використовуємо поля з моделі CustomUser -->
+    {% if user.bio %}
+        <p>Bio: {{ user.bio }}</p>
+    {% endif %}
+    {% if user.profile_image %}
+        <img src="{{ user.profile_image.url }}" alt="Profile Image">
+    {% else %}
+        <p>Profile image does not exist</p>
+    {% endif %}
+
+    <a href="{% url 'following_list' user.id %}" class="btn btn-outline-primary btn-sm">Following list</a>
+    <a href="{% url 'followers_list' user.id %}" class="btn btn-outline-primary btn-sm">Followers list</a>
+    <h2>Posts by Followers</h2>
+    {% if followers_posts %}
+        <div class="list-group mt-3">
+            {% for post in followers_posts %}
+                <a href="{% url 'post_detail' post.id %}" class="list-group-item list-group-item-action">{{ post.title }}</a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No posts from followers.</p>
+    {% endif %}
+        </div>
+    <a href="{% url 'edit_profile'  %}" class="list-group-item list-group-item-action">Edit Profile</a>
+{% endblock %}

@@ -32,6 +32,7 @@
               {% if user.is_authenticated %}
               <span class="me-3 text-white">Welcome, {{ user.username }}</span>
               <a href="{% url 'profile' %}" class="btn btn-warning">Profile</a>
+              <a href="{% url 'logout' %}">Logout</a>
               {% else %}
               <a href="{% url 'login' %}" class="btn btn-warning">Log-in</a>
               <a href="{% url 'auth' %}" class="btn btn-warning">Sign-up</a>

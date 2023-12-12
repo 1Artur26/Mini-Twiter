@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy
 from django.views import generic
 from custom_auth.forms import CustomUserCreationForm
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
@@ -57,6 +57,9 @@ class UserDetailView(DetailView):
     context_object_name = 'user'
 
 
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('main')
+
 
 @login_required
 def toggle_follow(request, user_id):
@@ -84,7 +87,7 @@ def edit_profile(request):
         form = UserEditForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect('profile_view')  
+            return redirect('profile')  
     else:
         form = UserEditForm(instance=request.user)
 
